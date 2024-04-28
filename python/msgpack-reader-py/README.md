@@ -22,8 +22,7 @@ The project requires the following tools configured on your developer machine:
 
 ## Setup
 
-After installing the required tools, in the root folder of msgpack-reader-py run the following command to get all the
-dependencies installed
+In the root folder of msgpack-reader-py run the following command to get all the dependencies installed
 
 ```bash
 poetry install --with dev
@@ -90,8 +89,8 @@ poetry run python msgpack_reader_py/streaming_reader_bench.py --stats -o benchma
 [msgpack_reader_py/streaming_reader_bench.py](msgpack_reader_py/streaming_reader_bench.py) contains a benchmark that
 generates msgpack file with **10000** messages, reads it back **into memory** and uses it to
 benchmark [StreamingReader](msgpack_reader_py/streaming_reader.py). I'm using memory instead of file on file system to
-reduce the IO effects on the benchmark. Average throughput (messages per second) in the table below is average time from
-the benchmark divided by 10000.
+reduce the IO effects on the benchmark. Average throughput (messages per second) in the table below is derived from average time from
+the benchmark: `1000 (ms in sec) / (average time in ms / 10000 messages)` which is `1000 (ms in sec) * 10000 (messages) / average time (ms)`
 
 ## Environment
 

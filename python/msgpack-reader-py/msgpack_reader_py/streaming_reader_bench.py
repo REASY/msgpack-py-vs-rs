@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import argparse
 import io
 import tempfile
 
@@ -22,8 +21,7 @@ def in_memory_stream_benchmark(msgpack_binary: bytes) -> int:
 messages = 10000
 seed = 42
 with tempfile.NamedTemporaryFile(delete_on_close=False) as fp:
-    args = argparse.Namespace(path=fp.name, messages=messages, seed=seed)
-    generate(args.path, args.messages, args.seed)
+    generate(path=fp.name, messages=messages, seed=seed)
     fp.close()
 
     with open(fp.name, "rb") as fh:
