@@ -12,6 +12,7 @@ The project relies on several tools and libraries:
 - [Coverage.py](https://coverage.readthedocs.io/) to measure code coverage
 - [mypy](https://mypy-lang.org/) for static type checking
 - [ruff](https://docs.astral.sh/ruff/) for code formatting
+- [pyperf](https://github.com/psf/pyperf) for benchmarking
 
 # Development
 
