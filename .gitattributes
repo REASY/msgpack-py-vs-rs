@@ -1,0 +1,1 @@
+./rust/msgpack-reader-rs/test_resources/10000_items.msgpack filter=lfs diff=lfs merge=lfs -text
