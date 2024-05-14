@@ -91,7 +91,7 @@ cargo fix
 cargo bench --bench in_memory_stream_benchmark --  --verbose
 ```
 
-# Benchmarking results
+# Benchmark results
 
 [msgpack-core/benches/in_memory_stream_benchmark.rs](msgpack-core/benches/in_memory_stream_benchmark.rs) contains a
 benchmark that

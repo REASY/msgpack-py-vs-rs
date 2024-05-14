@@ -85,13 +85,15 @@ poetry run mypy msgpack_reader_py
 poetry run python msgpack_reader_py/streaming_reader_bench.py --stats -o benchmark.result.json
 ```
 
-# Benchmarking results
+# Benchmark results
 
 [msgpack_reader_py/streaming_reader_bench.py](msgpack_reader_py/streaming_reader_bench.py) contains a benchmark that
 generates msgpack file with **10000** messages, reads it back **into memory** and uses it to
 benchmark [StreamingReader](msgpack_reader_py/streaming_reader.py). I'm using memory instead of file on file system to
-reduce the IO effects on the benchmark. Average throughput (messages per second) in the table below is derived from average time from
-the benchmark: `1000 (ms in sec) / (average time in ms / 10000 messages)` which is `1000 (ms in sec) * 10000 (messages) / average time (ms)`
+reduce the IO effects on the benchmark. Average throughput (messages per second) in the table below is derived from
+average time from
+the benchmark: `1000 (ms in sec) / (average time in ms / 10000 messages)` which
+is `1000 (ms in sec) * 10000 (messages) / average time (ms)`
 
 ## Environment
 
