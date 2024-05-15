@@ -12,4 +12,4 @@ According to the benchmarks, Rust implementation is **35.05** times faster than 
 | OS                       | Language                                                                        | Median, ms | MAD, µs | Average, ms | SD, µs | Average throughput msg/s |
 |--------------------------|---------------------------------------------------------------------------------|------------|---------|-------------|--------|--------------------------|
 | Ubuntu 24.04 LTS on WSL2 | Rust 1.78.0 (with [snmalloc-rs](https://github.com/SchrodingerZhu/snmalloc-rs)) | 2.1762     | 17.414  | 2.1765      | 15.965 | 4594532.50               |
-| Ubuntu 24.04 LTS on WSL2 | CPython, 3.12.3 (64-bit), compiled with GCC 13.2.0                              | 76.2       | 0.4     | 76.3        | 0.6    | 131233.59                |
+| Ubuntu 24.04 LTS on WSL2 | CPython, 3.12.3 (64-bit), compiled with GCC 13.2.0                              | 76.2       | 400     | 76.3        | 600    | 131233.59                |
