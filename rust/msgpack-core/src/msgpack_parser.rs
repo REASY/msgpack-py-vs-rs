@@ -23,9 +23,11 @@ impl<R: std::io::Read> MsgPackParser<R> {
                 Ok(value) => on_next(&value)?,
                 Err(err) => {
                     if err.kind() != UnexpectedEof {
+                        // In properly written msgpack files this should not happen, log and return error
                         warn!("Failed with err: {err}, kind: {}", err.kind());
                         return Err(errors::Error::from(err));
                     } else {
+                        // Reached EOF, we can stop the loop
                         break;
                     }
                 }
@@ -56,11 +58,21 @@ impl<R: std::io::Read> ItemMsgPackParser<R> {
                 on_next(&item)?;
                 Ok(())
             }
-            x => {
-                return Err(Error::from(ErrorKind::ItemMsgPackParser(format!(
-                    "Expected Array type but got {}",
-                    x
-                ))));
+            other => {
+                let t = match other {
+                    Value::Nil => "Nil",
+                    Value::Boolean(_) => "Boolean",
+                    Value::Integer(_) => "Integer",
+                    Value::F32(_) => "F32",
+                    Value::F64(_) => "F64",
+                    Value::String(_) => "String",
+                    Value::Binary(_) => "Binary",
+                    Value::Array(_) => "Array",
+                    Value::Map(_) => "Map",
+                    Value::Ext(_, _) => "Ext",
+                };
+                let msg = format!("Expected `Array` type but got `{}`", t);
+                return Err(Error::from(ErrorKind::ItemMsgPackParser(msg)));
             }
         })?;
         Ok(())
