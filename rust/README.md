@@ -110,10 +110,13 @@ is `1000 (ms in sec) * 10000 (messages) / average time (ms)`
 - CPU: AMD Ryzen 9 3950X 16-Core Processor 3.5 GHz
 - Memory: DDR4-2933 GHz 32 GB
 
-| OS                       | Median, ms | MAD, µs | Average, ms | SD, µs | Average throughput msg/s |
-|--------------------------|------------|---------|-------------|--------|--------------------------|
-| Windows 10 Pro N         | 4.3529     | 54.492  | 4.3563      | 49.052 | 2295526.0                |
-| Ubuntu 24.04 LTS on WSL2 | 2.8884     | 26.320  | 2.8924      | 43.566 | 3457336.46               |
+| OS                          | Memory allocator                                             | Median, ms | MAD, µs | Average, ms | SD, µs | Average throughput msg/s | Faster than baseline (avg), times |
+|-----------------------------|--------------------------------------------------------------|------------|---------|-------------|--------|--------------------------|-----------------------------------|
+| Windows 10 Pro N (Baseline) | Default                                                      | 4.2094     | 46.640  | 4.2093      | 46.862 | 2375691.92               | **1**                             |
+| Windows 10 Pro N            | [snmalloc-rs](https://github.com/SchrodingerZhu/snmalloc-rs) | 2.1603     | 19.505  | 2.1602      | 15.893 | 4628986.71               | **1.948**                         |
+| Ubuntu 24.04 LTS on WSL2    | Default                                                      | 2.7313     | 18.773  | 2.7310      | 18.491 | 3661662.39               | **1.541**                         |
+| Ubuntu 24.04 LTS on WSL2    | [snmalloc-rs](https://github.com/SchrodingerZhu/snmalloc-rs) | 2.1762     | 17.414  | 2.1765      | 15.965 | 4594532.50               | **1.933**                         |
+| Ubuntu 24.04 LTS on WSL2    | [jemallocator](https://github.com/tikv/jemallocator)         | 2.4596     | 17.084  | 2.4609      | 15.321 | 4063553.98               | **1.710**                         |
 
 Note:
 
@@ -123,66 +126,139 @@ Note:
 
 ## Windows 10 Pro N
 
+### Default allocator
+
 ```bash
 cargo bench --bench in_memory_stream_benchmark --  --verbose
-    Finished bench [optimized] target(s) in 0.14s
-     Running benches\in_memory_stream_benchmark.rs (target\release\deps\in_memory_stream_benchmark-b94fe03392101411.exe)
+   Compiling msgpack-core v0.1.1 (C:\repos\github\REASY\msgpack-py-vs-rs\rust\msgpack-core)
+    Finished `bench` profile [optimized] target(s) in 1.94s
+     Running benches\in_memory_stream_benchmark.rs (target\release\deps\in_memory_stream_benchmark-58b15471cc874faf.exe)
 Gnuplot not found, using plotters backend
 Benchmarking in_memory_stream_benchmark for 10000 messages
 Benchmarking in_memory_stream_benchmark for 10000 messages: Warming up for 3.0000 s
-Benchmarking in_memory_stream_benchmark for 10000 messages: Collecting 100 samples in estimated 5.2749 s (1200 iterations)
+Benchmarking in_memory_stream_benchmark for 10000 messages: Collecting 100 samples in estimated 5.0155 s (1200 iterations)
 Benchmarking in_memory_stream_benchmark for 10000 messages: Analyzing
 in_memory_stream_benchmark for 10000 messages
-                        time:   [4.3391 ms 4.3476 ms 4.3563 ms]
-Found 2 outliers among 100 measurements (2.00%)
-  2 (2.00%) high mild
-mean   [4.3391 ms 4.3563 ms] std. dev.      [37.719 µs 49.052 µs]
-median [4.3290 ms 4.3529 ms] med. abs. dev. [33.531 µs 54.492 µs]
+                        time:   [4.1932 ms 4.2012 ms 4.2093 ms]
+                        change: [+94.303% +94.733% +95.189%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+mean   [4.1932 ms 4.2093 ms] std. dev.      [33.655 µs 46.862 µs]
+median [4.1907 ms 4.2094 ms] med. abs. dev. [29.769 µs 46.640 µs]
+```
+
+### [snmalloc-rs](https://github.com/SchrodingerZhu/snmalloc-rs) allocator
+
+```bash
+cargo bench --features allocator-snmalloc --bench in_memory_stream_benchmark --  --verbose
+   Compiling msgpack-core v0.1.1 (C:\repos\github\REASY\msgpack-py-vs-rs\rust\msgpack-core)
+    Finished `bench` profile [optimized] target(s) in 1.93s
+     Running benches\in_memory_stream_benchmark.rs (target\release\deps\in_memory_stream_benchmark-3ae9f70d69127a08.exe)
+Gnuplot not found, using plotters backend
+Benchmarking in_memory_stream_benchmark for 10000 messages
+Benchmarking in_memory_stream_benchmark for 10000 messages: Warming up for 3.0000 s
+Benchmarking in_memory_stream_benchmark for 10000 messages: Collecting 100 samples in estimated 5.1661 s (2400 iterations)
+Benchmarking in_memory_stream_benchmark for 10000 messages: Analyzing
+in_memory_stream_benchmark for 10000 messages
+                        time:   [2.1547 ms 2.1574 ms 2.1602 ms]
+                        change: [-48.250% -48.105% -47.959%] (p = 0.00 < 0.05)
+                        Performance has improved.
+mean   [2.1547 ms 2.1602 ms] std. dev.      [12.585 µs 15.893 µs]
+median [2.1541 ms 2.1603 ms] med. abs. dev. [11.540 µs 19.505 µs]
 ```
 
 #### Rust compiler version
 
 ```bash
 rustc --version --verbose
-rustc 1.77.2 (25ef9e3d8 2024-04-09)
+rustc 1.78.0 (9b00956e5 2024-04-29)
 binary: rustc
-commit-hash: 25ef9e3d85d934b27d9dada2f9dd52b1dc63bb04
-commit-date: 2024-04-09
+commit-hash: 9b00956e56009bab2aa15d7bff10916599e3d6d6
+commit-date: 2024-04-29
 host: x86_64-pc-windows-msvc
-release: 1.77.2
-LLVM version: 17.0.6
+release: 1.78.0
+LLVM version: 18.1.2
 ```
 
 ## Ubuntu 24.04 LTS on WSL2
 
+### Default allocator
+
 ```bash
- cargo bench --bench in_memory_stream_benchmark --  --verbose
-    Finished bench [optimized] target(s) in 1.16s
-     Running benches/in_memory_stream_benchmark.rs (target/release/deps/in_memory_stream_benchmark-d01bab4a9f92a6b6)
+cargo bench --bench in_memory_stream_benchmark --  --verbose
+    Finished `bench` profile [optimized] target(s) in 1m 14s
+     Running benches/in_memory_stream_benchmark.rs (target/release/deps/in_memory_stream_benchmark-ef326d3d9792adad)
 Gnuplot not found, using plotters backend
 Benchmarking in_memory_stream_benchmark for 10000 messages
 Benchmarking in_memory_stream_benchmark for 10000 messages: Warming up for 3.0000 s
-Benchmarking in_memory_stream_benchmark for 10000 messages: Collecting 100 samples in estimated 5.2367 s (1800 iterations)
+Benchmarking in_memory_stream_benchmark for 10000 messages: Collecting 100 samples in estimated 5.1786 s (1900 iterations)
 Benchmarking in_memory_stream_benchmark for 10000 messages: Analyzing
 in_memory_stream_benchmark for 10000 messages
-                        time:   [2.8810 ms 2.8860 ms 2.8924 ms]
-                        change: [-33.809% -33.619% -33.433%] (p = 0.00 < 0.05)
+                        time:   [2.7249 ms 2.7280 ms 2.7310 ms]
+                        change: [+0.1953% +0.3755% +0.5540%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+mean   [2.7249 ms 2.7310 ms] std. dev.      [13.133 µs 18.491 µs]
+median [2.7233 ms 2.7313 ms] med. abs. dev. [12.621 µs 18.773 µs]
+```
+
+### [snmalloc-rs](https://github.com/SchrodingerZhu/snmalloc-rs) allocator
+
+```bash
+cargo bench --features allocator-snmalloc --bench in_memory_stream_benchmark --  --verbose
+   Compiling msgpack-core v0.1.1 (/mnt/c/repos/github/REASY/msgpack-py-vs-rs/rust/msgpack-core)
+    Finished `bench` profile [optimized] target(s) in 8.00s
+     Running benches/in_memory_stream_benchmark.rs (target/release/deps/in_memory_stream_benchmark-db30736c8c510f04)
+Gnuplot not found, using plotters backend
+Benchmarking in_memory_stream_benchmark for 10000 messages
+Benchmarking in_memory_stream_benchmark for 10000 messages: Warming up for 3.0000 s
+Benchmarking in_memory_stream_benchmark for 10000 messages: Collecting 100 samples in estimated 5.0503 s (2300 iterations)
+Benchmarking in_memory_stream_benchmark for 10000 messages: Analyzing
+in_memory_stream_benchmark for 10000 messages
+                        time:   [2.1710 ms 2.1737 ms 2.1765 ms]
+                        change: [-11.724% -11.572% -11.437%] (p = 0.00 < 0.05)
                         Performance has improved.
 Found 1 outliers among 100 measurements (1.00%)
-  1 (1.00%) high severe
-mean   [2.8810 ms 2.8924 ms] std. dev.      [16.600 µs 43.566 µs]
-median [2.8765 ms 2.8884 ms] med. abs. dev. [15.945 µs 26.320 µs]
+  1 (1.00%) high mild
+mean   [2.1710 ms 2.1765 ms] std. dev.      [11.837 µs 15.965 µs]
+median [2.1700 ms 2.1762 ms] med. abs. dev. [11.501 µs 17.414 µs]
+```
+
+### [jemallocator](https://github.com/tikv/jemallocator) allocator
+
+```bash
+cargo bench --features allocator-jemalloc --bench in_memory_stream_benchmark --  --verbose
+   Compiling tikv-jemalloc-sys v0.5.4+5.3.0-patched
+   Compiling snmalloc-sys v0.3.5
+   Compiling snmalloc-rs v0.3.5
+   Compiling tikv-jemallocator v0.5.4
+   Compiling msgpack-core v0.1.1 (/mnt/c/repos/github/REASY/msgpack-py-vs-rs/rust/msgpack-core)
+    Finished `bench` profile [optimized] target(s) in 1m 08s
+     Running benches/in_memory_stream_benchmark.rs (target/release/deps/in_memory_stream_benchmark-c2da915719955f3f)
+Gnuplot not found, using plotters backend
+Benchmarking in_memory_stream_benchmark for 10000 messages
+Benchmarking in_memory_stream_benchmark for 10000 messages: Warming up for 3.0000 s
+Benchmarking in_memory_stream_benchmark for 10000 messages: Collecting 100 samples in estimated 5.2037 s (2100 iterations)
+Benchmarking in_memory_stream_benchmark for 10000 messages: Analyzing
+in_memory_stream_benchmark for 10000 messages
+                        time:   [2.4556 ms 2.4582 ms 2.4609 ms]
+                        change: [-10.020% -9.8884% -9.7459%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+mean   [2.4556 ms 2.4609 ms] std. dev.      [11.677 µs 15.321 µs]
+median [2.4538 ms 2.4596 ms] med. abs. dev. [9.8766 µs 17.084 µs]
 ```
 
 #### Rust compiler version
 
 ```bash
 rustc --version --verbose
-rustc 1.77.2 (25ef9e3d8 2024-04-09)
+rustc 1.78.0 (9b00956e5 2024-04-29)
 binary: rustc
-commit-hash: 25ef9e3d85d934b27d9dada2f9dd52b1dc63bb04
-commit-date: 2024-04-09
+commit-hash: 9b00956e56009bab2aa15d7bff10916599e3d6d6
+commit-date: 2024-04-29
 host: x86_64-unknown-linux-gnu
-release: 1.77.2
-LLVM version: 17.0.6
+release: 1.78.0
+LLVM version: 18.1.2
 ```
