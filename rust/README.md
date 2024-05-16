@@ -110,19 +110,21 @@ is `1000 (ms in sec) * 10000 (messages) / average time (ms)`
 - CPU: AMD Ryzen 9 3950X 16-Core Processor 3.5 GHz
 - Memory: DDR4-2933 GHz 32 GB
 
-| OS                          | Memory allocator                                             | Median, ms | MAD, µs | Average, ms | SD, µs | Average throughput msg/s | Faster than baseline (avg), times |
-|-----------------------------|--------------------------------------------------------------|------------|---------|-------------|--------|--------------------------|-----------------------------------|
-| Windows 10 Pro N (Baseline) | Default                                                      | 4.2094     | 46.640  | 4.2093      | 46.862 | 2375691.92               | **1**                             |
-| Windows 10 Pro N            | [snmalloc-rs](https://github.com/SchrodingerZhu/snmalloc-rs) | 2.1603     | 19.505  | 2.1602      | 15.893 | 4628986.71               | **1.948**                         |
-| Ubuntu 24.04 LTS on WSL2    | Default                                                      | 2.7313     | 18.773  | 2.7310      | 18.491 | 3661662.39               | **1.541**                         |
-| Ubuntu 24.04 LTS on WSL2    | [snmalloc-rs](https://github.com/SchrodingerZhu/snmalloc-rs) | 2.1762     | 17.414  | 2.1765      | 15.965 | 4594532.50               | **1.933**                         |
-| Ubuntu 24.04 LTS on WSL2    | [jemallocator](https://github.com/tikv/jemallocator)         | 2.4596     | 17.084  | 2.4609      | 15.321 | 4063553.98               | **1.710**                         |
+| OS                          | Memory allocator                                             | Median, ms | MAD, µs | Average, ms | SD, µs | Average throughput msg/s | Average throughput, MBytes/s | Faster than baseline (avg), times |
+|-----------------------------|--------------------------------------------------------------|------------|---------|-------------|--------|--------------------------|------------------------------|-----------------------------------|
+| Windows 10 Pro N (Baseline) | Default                                                      | 4.2094     | 46.640  | 4.2093      | 46.862 | 2375691.92               | 126.74                       | **1**                             |
+| Windows 10 Pro N            | [snmalloc-rs](https://github.com/SchrodingerZhu/snmalloc-rs) | 2.1603     | 19.505  | 2.1602      | 15.893 | 4628986.71               | 246.96                       | **1.948**                         |
+| Ubuntu 24.04 LTS on WSL2    | Default                                                      | 2.7313     | 18.773  | 2.7310      | 18.491 | 3661662.39               | 195.35                       | **1.541**                         |
+| Ubuntu 24.04 LTS on WSL2    | [snmalloc-rs](https://github.com/SchrodingerZhu/snmalloc-rs) | 2.1762     | 17.414  | 2.1765      | 15.965 | 4594532.50               | 245.12                       | **1.933**                         |
+| Ubuntu 24.04 LTS on WSL2    | [jemallocator](https://github.com/tikv/jemallocator)         | 2.4596     | 17.084  | 2.4609      | 15.321 | 4063553.98               | 216.79                       | **1.710**                         |
 
 Note:
 
 - Used statistics from upper bound
 - MAD is Median absolute deviation
 - SD is Standard deviation
+- Average throughput in MBytes/s calculated from average message size = 559439 bytes (total size of 10000 messages) /
+  10000 messages = 55.9439 bytes/msg
 
 ## Windows 10 Pro N
 
