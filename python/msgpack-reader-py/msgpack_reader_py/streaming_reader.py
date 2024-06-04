@@ -1,7 +1,6 @@
 import io
 import logging
-import typing
-from typing import Callable, TypeVar
+from typing import Callable, TypeVar, Generic, BinaryIO, Any, Self, Optional
 
 from msgpack import Unpacker
 
@@ -10,23 +9,21 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 
-class StreamingReader(typing.Generic[T]):
-    file_path_or_binary: typing.Union[str, typing.BinaryIO]
+class StreamingReader(Generic[T]):
+    file_path_or_binary: str | BinaryIO
 
     def __init__(
         self,
-        file_path_or_binary: typing.Union[str, typing.BinaryIO],
-        mapper: Callable[[typing.Any], T],
+        file_path_or_binary: str | BinaryIO,
+        mapper: Callable[[Any], T],
     ) -> None:
         self.file_path_or_binary = file_path_or_binary
         self.mapper = mapper
 
-    def __enter__(self) -> typing.Self:
+    def __enter__(self) -> Self:
         # Open provided `self.file_path_or_binary` as a file if it is string, meaning path to a file
         if isinstance(self.file_path_or_binary, str):
-            self.file: typing.Optional[typing.BinaryIO] = open(
-                self.file_path_or_binary, "rb"
-            )
+            self.file: Optional[BinaryIO] = open(self.file_path_or_binary, "rb")
         elif isinstance(self.file_path_or_binary, io.BytesIO):
             # if it is io.BytesIO, use it as file as well, it follows file's API
             self.file = self.file_path_or_binary
@@ -44,7 +41,7 @@ class StreamingReader(typing.Generic[T]):
         finally:
             self.file = None
 
-    def __iter__(self) -> typing.Self:
+    def __iter__(self) -> Self:
         return self
 
     def __next__(self) -> T:

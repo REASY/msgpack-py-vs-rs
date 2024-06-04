@@ -1,9 +1,9 @@
-import typing
+from typing import Any, Self, final
 from dataclasses import dataclass
 
 
 @dataclass
-@typing.final
+@final
 class Item:
     id: int
     process_id: int
@@ -15,7 +15,7 @@ class Item:
     path: str
 
     @classmethod
-    def from_list(cls, items: list[typing.Any]) -> typing.Self:
+    def from_list(cls, items: list[Any]) -> Self:
         return Item(
             items[0],
             items[1],

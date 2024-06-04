@@ -1,14 +1,14 @@
 import argparse
 import random
 import string
-import typing
+from typing import Iterator, BinaryIO
 
 import msgpack
 
 from msgpack_reader_py.model import Item, item_to_list
 
 
-def get_iter(messages: int, seed: int) -> typing.Iterator[Item]:
+def get_iter(messages: int, seed: int) -> Iterator[Item]:
     rnd = random.Random(x=seed)
     for i in range(messages):
         process_id = rnd.randint(0, 65535)
@@ -37,7 +37,7 @@ def generate(path: str, messages: int, seed: int) -> None:
         write_items(f, iterator)
 
 
-def write_items(io: typing.BinaryIO, iterator: typing.Iterator[Item]) -> None:
+def write_items(io: BinaryIO, iterator: Iterator[Item]) -> None:
     packer = msgpack.Packer(
         default=item_to_list,
     )

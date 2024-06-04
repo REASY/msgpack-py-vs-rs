@@ -1,5 +1,5 @@
 import time
-import typing
+from typing import Any
 from msgpack_reader_py.streaming_reader import StreamingReader
 
 
@@ -7,7 +7,7 @@ def main() -> None:
     msgs = 0
     t0 = time.time()
 
-    def identity(x: typing.Any) -> typing.Any:
+    def identity(x: Any) -> Any:
         return x
 
     with StreamingReader(
